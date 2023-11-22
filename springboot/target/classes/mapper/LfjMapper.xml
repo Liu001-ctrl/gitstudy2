@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mapper.LfjStudentMapper">
+
+    <select id="getStudentbyid" parameterType="int" resultType="Student">
+        SELECT * FROM student WHERE id=#{id}
+    </select>
+    <update id="UpdateStudent" parameterType="Student">
+        UPDATE student SET name=#{name} WHERE id=#{id}
+    </update>
+    <delete id="deleteStudent" parameterType="Integer">
+        DELETE FROM student WHERE id=#{id}
+    </delete>
+    <select id="getall" resultType="Student">
+        select * from student
+    </select>
+    <insert id="insertStudent" parameterType="Student">
+        INSERT INTO student (name)
+        VALUES(#{name});
+    </insert>
+
+    <select id="getcourseWithStudentById"  parameterType="int" resultMap="onetomany">
+        SELECT s.id, s.name,
+               c.id ,c.name,c.description,c.student_id
+        FROM student s
+                 LEFT JOIN course c ON s.id = c.student_id
+        WHERE s.id = #{id};
+    </select>
+    <resultMap id="onetomany" type="Student">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <collection property="course" ofType="course">
+            <id property="id" column="id" />
+            <result property="name" column="name" />
+            <result property ="description" column="description" />
+            <result property="student_id" column="student_id" />
+        </collection>
+    </resultMap>
+
+    <select id="getcourseWithTeacherById"  parameterType="int" resultMap="manytomany">
+        SELECT t.id, t.name,t.teaching_expertise,
+               c.id ,c.name,c.description,c.student_id
+        FROM teacher t
+                 LEFT JOIN teacher_course tc ON t.id = tc.teacher_id
+                 LEFT JOIN course c ON tc.course_id = c.id
+        WHERE t.id = #{teacher_id}
+    </select>
+    <resultMap id="manytomany" type="teacher">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property=" teaching_expertise" column=" teaching_expertise" />
+
+        <collection property="courses" ofType="course">
+            <id property="id" column="id" />
+            <result property="name" column="name" />
+            <result property ="description" column="description" />
+            <result property="student_id" column="student_id" />
+        </collection>
+    </resultMap>
+
+
+
+</mapper>
